@@ -1,0 +1,33 @@
+name: Bilan or
+
+on:
+  schedule:
+    - cron: "30 6 * * 1-5"   # 06h30 UTC = 07h30 à Paris en hiver (08h30 en été) ; GitHub peut retarder l'exécution
+  workflow_dispatch:          # lancement manuel : onglet Actions > Bilan or > Run workflow
+
+permissions:
+  contents: write
+
+jobs:
+  bilan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Tests du code
+        run: python -m unittest discover -s tests -v
+      - name: Récupérer l'historique de l'or
+        env:
+          ALPHAVANTAGE_API_KEY: ${{ secrets.ALPHAVANTAGE_API_KEY }}
+        run: python scripts/fetch_or.py
+      - name: Calculer les signaux
+        run: python scripts/signaux_or.py
+      - name: Enregistrer le rapport
+        run: |
+          git config user.name "bilan-automatique"
+          git config user.email "bilan-automatique@users.noreply.github.com"
+          git add data rapports
+          git diff --cached --quiet || git commit -m "Bilan automatique"
+          git push
