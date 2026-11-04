@@ -23,7 +23,13 @@ def convertir(obj):
 
 
 def telecharger(intervalle, plage):
-    url = ("https://query1.finance.yahoo.com/v8/finance/chart/GC=F?range=%s&interval=%s" % (plage, intervalle))
+    if plage == "max":  # « range=max » renvoie parfois du mensuel : on borne les dates
+        import time
+        debut = int(time.time()) - 20 * 366 * 86400
+        url = ("https://query1.finance.yahoo.com/v8/finance/chart/GC=F?period1=%d&period2=%d&interval=%s"
+               % (debut, int(time.time()), intervalle))
+    else:
+        url = ("https://query1.finance.yahoo.com/v8/finance/chart/GC=F?range=%s&interval=%s" % (plage, intervalle))
     req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
     with urllib.request.urlopen(req, timeout=60) as f:
         return json.load(f)
