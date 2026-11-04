@@ -22,6 +22,19 @@ def convertir(obj):
     return lignes
 
 
+def fusionner(chemin, nouvelles):
+    """Garde l'historique déjà enregistré et y ajoute/remplace les nouvelles lignes (par date)."""
+    base = {}
+    if chemin.exists():
+        with open(chemin, newline="") as f:
+            for r in list(csv.reader(f))[1:]:
+                if len(r) == 6:
+                    base[r[0]] = [r[0]] + [float(x) for x in r[1:5]] + [float(r[5])]
+    for r in nouvelles:
+        base[r[0]] = r
+    return [base[k] for k in sorted(base)]
+
+
 def telecharger(intervalle, plage):
     if plage == "max":  # « range=max » renvoie parfois du mensuel : on borne les dates
         import time
@@ -41,6 +54,7 @@ def main():
             lignes = convertir(telecharger(inter, plage))
             if len(lignes) < 10:
                 raise ValueError("trop peu de lignes")
+            lignes = fusionner(RACINE / sortie, lignes)
             with open(RACINE / sortie, "w", newline="") as f:
                 w = csv.writer(f)
                 w.writerow(["date_utc", "open", "high", "low", "close", "volume"])
