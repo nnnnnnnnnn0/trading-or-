@@ -1,6 +1,7 @@
 """Télécharge l'or (futures GC=F) avec ouverture/plus haut/plus bas/clôture/volume.
 Source : Yahoo Finance (sans clé). Tourne dans GitHub Actions. Un échec n'arrête pas le reste."""
 import csv, json, sys, datetime, urllib.request
+from urllib.parse import quote
 from pathlib import Path
 
 RACINE = Path(__file__).resolve().parent.parent
@@ -35,14 +36,14 @@ def fusionner(chemin, nouvelles):
     return [base[k] for k in sorted(base)]
 
 
-def telecharger(intervalle, plage):
+def telecharger(intervalle, plage, symbole="GC=F"):
     if plage == "max":  # « range=max » renvoie parfois du mensuel : on borne les dates
         import time
         debut = int(time.time()) - 20 * 366 * 86400
-        url = ("https://query1.finance.yahoo.com/v8/finance/chart/GC=F?period1=%d&period2=%d&interval=%s"
-               % (debut, int(time.time()), intervalle))
+        url = ("https://query1.finance.yahoo.com/v8/finance/chart/%s?period1=%d&period2=%d&interval=%s"
+               % (quote(symbole), debut, int(time.time()), intervalle))
     else:
-        url = ("https://query1.finance.yahoo.com/v8/finance/chart/GC=F?range=%s&interval=%s" % (plage, intervalle))
+        url = ("https://query1.finance.yahoo.com/v8/finance/chart/%s?range=%s&interval=%s" % (quote(symbole), plage, intervalle))
     req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
     with urllib.request.urlopen(req, timeout=60) as f:
         return json.load(f)
