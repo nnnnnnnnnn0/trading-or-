@@ -2,6 +2,7 @@ name: Bilan or
 
 on:
   schedule:
+    - cron: "5 */3 * * *"   # complète l'historique 5 min (temporaire, jusqu'à complétion)
     - cron: "30 6 * * 1-5"   # 06h30 UTC = 07h30 à Paris en hiver (08h30 en été) ; GitHub peut retarder l'exécution
   push:
     paths: ["scripts/fetch_ohlc.py", "scripts/fetch_facteurs.py", "scripts/modele_facteurs.py", "scripts/fetch_histo.py"]   # se relance quand ce script change
@@ -37,7 +38,7 @@ jobs:
           python scripts/modele_facteurs.py --journal
       - name: Historique 5 min de l'or (par lots, reprend où il s'est arrêté)
         continue-on-error: true
-        timeout-minutes: 25
+        timeout-minutes: 50
         run: python scripts/fetch_histo.py
       - name: Calculer les signaux
         run: python scripts/signaux_or.py

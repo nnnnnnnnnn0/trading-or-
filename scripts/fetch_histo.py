@@ -13,7 +13,7 @@ URL = "https://datafeed.dukascopy.com/datafeed/XAUUSD/%04d/%02d/%02d/BID_candles
 
 def telecharger(jour):
     url = URL % (jour.year, jour.month - 1, jour.day)
-    for essai in range(3):
+    for essai in range(5):
         try:
             req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
             with urllib.request.urlopen(req, timeout=30) as f:
@@ -24,7 +24,7 @@ def telecharger(jour):
             err = "HTTP %d" % e.code
         except Exception as e:
             err = type(e).__name__
-        time.sleep(1 + essai)
+        time.sleep(2 + 3 * essai)
     return jour, None, err
 
 
@@ -64,8 +64,8 @@ def main():
     manquants = [DEBUT + dt.timedelta(days=i) for i in range((fin - DEBUT).days + 1)]
     manquants = [j for j in manquants if j.weekday() != 5 and j.isoformat() not in existants]
     manquants = [j for j in manquants if j.isoformat() not in vides()]
-    statut.append("jours à télécharger : %d (600 max par exécution)" % len(manquants))
-    manquants = manquants[-600:]  # les plus récents d'abord ; les exécutions suivantes complètent
+    statut.append("jours à télécharger : %d (40 min max par exécution)" % len(manquants))
+    manquants = manquants[-3000:]  # les plus récents d'abord ; les exécutions suivantes complètent
     # échelle des prix : testée sur le premier fichier non vide
     echelle = None
     nouveaux, erreurs, vus_vides = {}, 0, []
@@ -73,8 +73,8 @@ def main():
     def lots():
         with ThreadPoolExecutor(8) as ex:
             for i in range(0, len(manquants), 64):
-                if time.time() - t0 > 900:
-                    statut.append("budget de 15 minutes atteint : le reste à la prochaine exécution")
+                if time.time() - t0 > 2400:
+                    statut.append("budget de 40 minutes atteint : le reste à la prochaine exécution")
                     return
                 yield from ex.map(telecharger, manquants[i:i + 64])
     if True:
