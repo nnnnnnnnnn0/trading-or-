@@ -11,6 +11,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: bilan-or
+  cancel-in-progress: false
+
 jobs:
   bilan:
     runs-on: ubuntu-latest
@@ -38,7 +42,7 @@ jobs:
           python scripts/modele_facteurs.py --journal
       - name: Historique 5 min de l'or (par lots, reprend où il s'est arrêté)
         continue-on-error: true
-        timeout-minutes: 50
+        timeout-minutes: 20
         run: python scripts/fetch_histo.py
       - name: Calculer les signaux
         run: python scripts/signaux_or.py
