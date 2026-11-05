@@ -69,8 +69,16 @@ def main():
     # échelle des prix : testée sur le premier fichier non vide
     echelle = None
     nouveaux, erreurs, vus_vides = {}, 0, []
-    with ThreadPoolExecutor(8) as ex:
-        for jour, brut, err in ex.map(telecharger, manquants):
+    t0 = time.time()
+    def lots():
+        with ThreadPoolExecutor(8) as ex:
+            for i in range(0, len(manquants), 64):
+                if time.time() - t0 > 900:
+                    statut.append("budget de 15 minutes atteint : le reste à la prochaine exécution")
+                    return
+                yield from ex.map(telecharger, manquants[i:i + 64])
+    if True:
+        for jour, brut, err in lots():
             if brut is None:
                 erreurs += 1
                 if erreurs <= 3:
