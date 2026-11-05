@@ -22,7 +22,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from backtest_or import metriques, fr, verdict  # noqa: E402
 
 RACINE = Path(__file__).resolve().parent.parent
-SORTIE = RACINE / "resultats" / "backtest_mtf_v1.md"
+SORTIE = RACINE / "resultats" / ("backtest_mtf_histo.md" if "--histo" in sys.argv else "backtest_mtf_v1.md")
+TIRAGES = {dt.timedelta(minutes=5): 100}
 PARIS, NY = ZoneInfo("Europe/Paris"), ZoneInfo("America/New_York")
 FRAIS_AR, FINANCEMENT = 0.0005, 0.00015
 HEURE_MIN, HEURE_MAX = 8, 20          # heure d'entrée (Paris) : 8 h inclus, 20 h exclu
@@ -54,6 +55,29 @@ def lire(chemin, pas_min):
             d = dt.datetime.strptime(r[0], "%Y-%m-%d %H:%M").replace(tzinfo=dt.timezone.utc)
             lignes.append([d] + v)
     return lignes[:-1]  # la dernière bougie est peut-être en cours
+
+
+def lire_histo():
+    """Historique 5 min (Dukascopy, or au comptant) -> lignes 5 min et lignes 1 h."""
+    import gzip
+    cinq, heures = [], {}
+    for f in sorted((RACINE / "data" / "histo").glob("xauusd_5m_*.csv.gz")):
+        with gzip.open(f, "rt") as g:
+            lecteur = csv.reader(g)
+            next(lecteur)
+            for r in lecteur:
+                v = [float(x) for x in r[1:5]]
+                if v[0] == v[1] == v[2] == v[3]:
+                    continue
+                d = dt.datetime.strptime(r[0], "%Y-%m-%d %H:%M").replace(tzinfo=dt.timezone.utc)
+                cinq.append([d] + v)
+                k = d.replace(minute=0)
+                b = heures.get(k)
+                if b is None:
+                    heures[k] = [k] + v
+                else:
+                    b[2], b[3], b[4] = max(b[2], v[1]), min(b[3], v[2]), v[3]
+    return cinq[:-1], [heures[k] for k in sorted(heures)][:-1]
 
 
 def filtre_jour(chemin):
@@ -100,11 +124,11 @@ def preparations(s, fj):
     prep = [None] * s.n
     for i in range(45, s.n):
         tend = fj.get(s.td[i], (0, False))[0]
-        if tend > 0 and bas[i] >= 3:
+        if tend > 0 and bas[i] >= 3 and i - bas[i] + 1 >= 24:
             a = i - bas[i] + 1
             if min(s.l[a:i + 1]) > min(s.l[a - 24:a]):
                 prep[i] = (1, min(s.l[a:i + 1]))
-        elif tend < 0 and haut[i] >= 3:
+        elif tend < 0 and haut[i] >= 3 and i - haut[i] + 1 >= 24:
             a = i - haut[i] + 1
             if max(s.h[a:i + 1]) < max(s.h[a - 24:a]):
                 prep[i] = (-1, max(s.h[a:i + 1]))
@@ -243,6 +267,7 @@ def part(base, m):
 
 
 def bloc(titre, decl, ctx, prep, variante, periodes, rng, tirages=500):
+    tirages = TIRAGES.get(decl.dur, tirages)
     lignes = ["### " + titre, "",
               "| Période | Ordres | Réussite | R moyen (± IC 95 %) | Facteur de profit | Perte max (R) | Durée moy. (jours) | R moyen, frais ×2 | Hasard, direction libre | Hasard, dans la tendance |",
               "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |"]
@@ -269,15 +294,21 @@ def bloc(titre, decl, ctx, prep, variante, periodes, rng, tirages=500):
 
 def main():
     fj = filtre_jour(RACINE / "data" / "or_ohlc_jour.csv")
-    h1 = Serie(lire(RACINE / "data" / "or_ohlc_1h.csv", 60), 60)
-    m5 = Serie(lire(RACINE / "data" / "or_ohlc_5m.csv", 5), 5)
+    histo = "--histo" in sys.argv
+    if histo:
+        l5, l1 = lire_histo()
+        h1, m5 = Serie(l1, 60), Serie(l5, 5)
+    else:
+        h1 = Serie(lire(RACINE / "data" / "or_ohlc_1h.csv", 60), 60)
+        m5 = Serie(lire(RACINE / "data" / "or_ohlc_5m.csv", 5), 5)
     atr1, prep = preparations(h1, fj)
     rng = random.Random(2026)
     c1 = contexte(h1, h1, atr1, fj)
     c5 = contexte(m5, h1, atr1, fj)
     cp = int(h1.n * 0.7)
     per1 = [("Tout", 60, h1.n - 2), ("Développement (70 %)", 60, cp), ("Contrôle (30 %)", cp, h1.n - 2)]
-    per5 = [("Tout", 60, m5.n - 2)]
+    cp5 = int(m5.n * 0.7)
+    per5 = [("Tout", 60, m5.n - 2), ("Développement (70 %)", 60, cp5), ("Contrôle (30 %)", cp5, m5.n - 2)] if histo else [("Tout", 60, m5.n - 2)]
     jeux = [("Déclenchement 1 h, intraday", h1, c1, "intraday", per1),
             ("Déclenchement 1 h, swing court (3 jours max)", h1, c1, "swing", per1),
             ("Déclenchement 5 min, intraday", m5, c5, "intraday", per5),
@@ -302,7 +333,7 @@ def main():
     e1, e2 = m5.t[0].date(), m5.t[-1].date()
     texte = [
         "# Backtest v1 : Alignement multi-échelles (or)", "",
-        "Données : filtre de tendance sur %d jours (2006 à aujourd'hui), bougies 1 h du %s au %s (%d bougies), bougies 5 min du %s au %s (%d bougies). Source : futures GC=F (Yahoo Finance). Une seule exécution, règles non ajustées après coup." % (len(fj), d1, d2, h1.n, e1, e2, m5.n),
+        "Données : filtre de tendance sur %d jours (2006 à aujourd'hui), bougies 1 h du %s au %s (%d bougies), bougies 5 min du %s au %s (%d bougies). Source : %s. Une seule exécution, règles non ajustées après coup." % (len(fj), d1, d2, h1.n, e1, e2, m5.n, "or au comptant XAUUSD, prix vendeur (Dukascopy) pour 1 h et 5 min ; futures GC=F (Yahoo) pour le filtre journalier" if "--histo" in sys.argv else "futures GC=F (Yahoo Finance)"),
         "", "**Un bon backtest ne prouve rien sur l'avenir ; un mauvais est une information utile.**", "",
         "## Résumé (période de contrôle pour le 1 h, ensemble des données pour le 5 min)", "",
         "| Version | Ordres | R moyen | Verdict |", "| --- | --- | --- | --- |"] + resume + ["", "## Détail", ""] + sections + [
