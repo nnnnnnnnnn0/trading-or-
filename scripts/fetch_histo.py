@@ -1,7 +1,7 @@
 """Historique 5 min de l'or au comptant (XAUUSD, prix vendeur) depuis Dukascopy (gratuit, sans clé).
 Reprise automatique : ne retélécharge que les jours manquants. Écrit un fichier de statut lisible.
 Tourne dans GitHub Actions (le réseau y est ouvert)."""
-import csv, datetime as dt, gzip, io, lzma, struct, sys, time, urllib.request
+import csv, datetime as dt, gzip, io, lzma, struct, sys, time, traceback, urllib.error, urllib.request
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
@@ -64,7 +64,8 @@ def main():
     manquants = [DEBUT + dt.timedelta(days=i) for i in range((fin - DEBUT).days + 1)]
     manquants = [j for j in manquants if j.weekday() != 5 and j.isoformat() not in existants]
     manquants = [j for j in manquants if j.isoformat() not in vides()]
-    statut.append("jours à télécharger : %d" % len(manquants))
+    statut.append("jours à télécharger : %d (600 max par exécution)" % len(manquants))
+    manquants = manquants[-600:]  # les plus récents d'abord ; les exécutions suivantes complètent
     # échelle des prix : testée sur le premier fichier non vide
     echelle = None
     nouveaux, erreurs, vus_vides = {}, 0, []
@@ -121,4 +122,9 @@ def vides():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception:
+        DOSSIER.mkdir(parents=True, exist_ok=True)
+        (DOSSIER / "statut.txt").write_text("ÉCHEC\n" + traceback.format_exc()[-1500:])
+        print(traceback.format_exc())
