@@ -1,0 +1,31 @@
+name: Historique 5 min de l'or
+
+on:
+  workflow_dispatch:
+  push:
+    paths: ["scripts/fetch_histo.py"]
+  schedule:
+    - cron: "15 5 * * 1"   # chaque lundi : complète les jours manquants
+
+permissions:
+  contents: write
+
+jobs:
+  histo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Télécharger l'historique (reprend là où il s'est arrêté)
+        run: python scripts/fetch_histo.py
+      - name: Enregistrer
+        run: |
+          git config user.name "Claude"
+          git config user.email "noreply@anthropic.com"
+          git add data/histo
+          git diff --cached --quiet || git commit -m "Historique 5 min de l'or"
+          git pull --rebase origin main
+          git push
