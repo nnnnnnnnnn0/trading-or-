@@ -9,6 +9,7 @@ from fetch_ohlc import RACINE, convertir, fusionner, telecharger
 FACTEURS = [("dollar_dxy", "DX-Y.NYB"), ("taux_10ans", "^TNX"), ("taux_5ans", "^FVX"),
             ("taux_13sem", "^IRX"), ("argent", "SI=F"), ("vix", "^VIX"),
             ("sp500", "^GSPC"), ("petrole_wti", "CL=F"), ("etf_or_gld", "GLD")]
+FRED = [("taux_reels_10ans", "DFII10"), ("inflation_implicite_10ans", "T10YIE"), ("gvz_volatilite_or", "GVZCLS")]
 CALENDRIER = "https://nfs.faireconomy.media/ff_calendar_thisweek.json"
 FICHIER_CAL = RACINE / "data" / "calendrier.csv"
 
@@ -27,6 +28,33 @@ def facteurs():
             print("OK", nom, len(lignes), lignes[0][0], lignes[-1][0])
         except Exception as e:
             print("ÉCHEC", nom, type(e).__name__, str(e)[:120])
+
+
+def lignes_fred(texte):
+    """Texte CSV de FRED (date, valeur ; « . » = pas de valeur) -> lignes date, ouv, haut, bas, clôture, volume."""
+    out = []
+    for r in list(csv.reader(texte.splitlines()))[1:]:
+        if len(r) >= 2 and r[1] not in (".", ""):
+            v = round(float(r[1]), 4)
+            out.append([r[0] + " 00:00", v, v, v, v, 0])
+    return out
+
+
+def fred():
+    for nom, serie in FRED:
+        try:
+            req = urllib.request.Request("https://fred.stlouisfed.org/graph/fredgraph.csv?id=" + serie, headers={"User-Agent": "Mozilla/5.0"})
+            with urllib.request.urlopen(req, timeout=60) as f:
+                lignes = fusionner(RACINE / "data" / ("facteur_%s.csv" % nom), lignes_fred(f.read().decode("utf-8")))
+            if len(lignes) < 100:
+                raise ValueError("trop peu de lignes")
+            with open(RACINE / "data" / ("facteur_%s.csv" % nom), "w", newline="") as f:
+                w = csv.writer(f)
+                w.writerow(["date_utc", "open", "high", "low", "close", "volume"])
+                w.writerows(lignes)
+            print("OK FRED", nom, len(lignes), lignes[0][0], lignes[-1][0])
+        except Exception as e:
+            print("ÉCHEC FRED", nom, type(e).__name__, str(e)[:120])
 
 
 def calendrier():
@@ -54,4 +82,5 @@ def calendrier():
 
 if __name__ == "__main__":
     facteurs()
+    fred()
     calendrier()
