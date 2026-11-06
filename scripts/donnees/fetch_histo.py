@@ -13,10 +13,10 @@ URL = "https://datafeed.dukascopy.com/datafeed/XAUUSD/%04d/%02d/%02d/BID_candles
 
 def telecharger(jour):
     url = URL % (jour.year, jour.month - 1, jour.day)
-    for essai in range(5):
+    for essai in range(3):
         try:
             req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-            with urllib.request.urlopen(req, timeout=30) as f:
+            with urllib.request.urlopen(req, timeout=20) as f:
                 return jour, f.read(), None
         except urllib.error.HTTPError as e:
             if e.code == 404:
@@ -24,7 +24,7 @@ def telecharger(jour):
             err = "HTTP %d" % e.code
         except Exception as e:
             err = type(e).__name__
-        time.sleep(2 + 3 * essai)
+        time.sleep(2 + 2 * essai)
     return jour, None, err
 
 
@@ -68,7 +68,7 @@ def main():
     echecs = json.loads(fichier_echecs.read_text()) if fichier_echecs.exists() else {}
     manquants = [j for j in manquants if echecs.get(j.isoformat(), 0) < 8]  # abandon après 8 échecs
     tous = len(manquants)
-    statut.append("jours à télécharger : %d (45 min max par exécution)" % len(manquants))
+    statut.append("jours à télécharger : %d (20 min max par exécution)" % len(manquants))
     manquants = manquants[-3000:]  # les plus récents d'abord ; les exécutions suivantes complètent
     # échelle des prix : testée sur le premier fichier non vide
     echelle = None
@@ -76,11 +76,11 @@ def main():
     t0 = time.time()
     def lots():
         with ThreadPoolExecutor(16) as ex:
-            for i in range(0, len(manquants), 128):
-                if time.time() - t0 > 2700:
-                    statut.append("budget de 45 minutes atteint : le reste à la prochaine exécution")
+            for i in range(0, len(manquants), 32):
+                if time.time() - t0 > 1200:
+                    statut.append("budget de 20 minutes atteint : le reste à la prochaine exécution")
                     return
-                yield from ex.map(telecharger, manquants[i:i + 128])
+                yield from ex.map(telecharger, manquants[i:i + 32])
     if True:
         for jour, brut, err in lots():
             if brut is None:

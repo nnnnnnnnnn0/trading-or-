@@ -18,7 +18,7 @@ permissions:
 
 concurrency:
   group: bilan-or
-  cancel-in-progress: false
+  cancel-in-progress: ${{ github.event_name == 'push' }}   # un nouveau push remplace l'exécution en cours ; la boucle de téléchargement n'est jamais interrompue
 
 jobs:
   bilan:
@@ -32,6 +32,8 @@ jobs:
       - name: Tests du code
         run: python -m unittest discover -s tests -v
       - name: Historique quotidien de l'or (Alpha Vantage)
+        id: av
+        continue-on-error: true
         env:
           ALPHAVANTAGE_API_KEY: ${{ secrets.ALPHAVANTAGE_API_KEY }}
         run: python scripts/donnees/fetch_or.py
@@ -47,8 +49,16 @@ jobs:
           pip install --quiet pandas numpy scikit-learn
           python scripts/quotidien/modele_facteurs.py --journal
       - name: Signaux du jour
+        id: signaux
+        continue-on-error: true
         run: python scripts/quotidien/signaux_or.py
+      - name: Diagnostic (lisible dans le dépôt)
+        if: always()
+        run: |
+          echo "$(date -u +%FT%TZ) alphavantage=${{ steps.av.outcome }} signaux=${{ steps.signaux.outcome }}" >> data/diagnostic_actions.txt
+          tail -n 30 data/diagnostic_actions.txt > data/d.tmp && mv data/d.tmp data/diagnostic_actions.txt
       - name: Enregistrer
+        if: always()
         run: |
           git config user.name "Claude"
           git config user.email "noreply@anthropic.com"
@@ -66,7 +76,7 @@ jobs:
           python-version: "3.12"
       - name: Historique 5 min de l'or (par lots, reprend où il s'est arrêté)
         continue-on-error: true
-        timeout-minutes: 50
+        timeout-minutes: 40
         run: python scripts/donnees/fetch_histo.py
       - name: Enregistrer
         if: always()
