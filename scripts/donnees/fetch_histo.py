@@ -13,7 +13,7 @@ URL = "https://datafeed.dukascopy.com/datafeed/XAUUSD/%04d/%02d/%02d/BID_candles
 
 def telecharger(jour):
     url = URL % (jour.year, jour.month - 1, jour.day)
-    for essai in range(3):
+    for essai in range(2):
         try:
             req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
             with urllib.request.urlopen(req, timeout=20) as f:
@@ -66,7 +66,7 @@ def main():
     manquants = [j for j in manquants if j.isoformat() not in vides()]
     fichier_echecs = DOSSIER / "echecs.json"
     echecs = json.loads(fichier_echecs.read_text()) if fichier_echecs.exists() else {}
-    manquants = [j for j in manquants if echecs.get(j.isoformat(), 0) < 8]  # abandon après 8 échecs
+    manquants = [j for j in manquants if echecs.get(j.isoformat(), 0) < 15]  # abandon après 15 échecs
     tous = len(manquants)
     statut.append("jours à télécharger : %d (20 min max par exécution)" % len(manquants))
     manquants = manquants[-3000:]  # les plus récents d'abord ; les exécutions suivantes complètent
@@ -75,7 +75,7 @@ def main():
     nouveaux, erreurs, vus_vides = {}, 0, []
     t0 = time.time()
     def lots():
-        with ThreadPoolExecutor(16) as ex:
+        with ThreadPoolExecutor(8) as ex:
             for i in range(0, len(manquants), 32):
                 if time.time() - t0 > 1200:
                     statut.append("budget de 20 minutes atteint : le reste à la prochaine exécution")

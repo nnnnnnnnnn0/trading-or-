@@ -18,7 +18,7 @@ Projet de test de stratégies sur l'or, **en ordres fictifs, sans argent réel**
 
 ## Automatisation (GitHub Actions, workflow « Bilan or »)
 - **Chaque jour ouvré à 6 h 30 UTC** et à chaque modification du code : tests, téléchargement des données, signaux du jour, prédiction du modèle, enregistrement.
-- **Historique 5 min** : un second travail télécharge Dukascopy par lots de 50 minutes et **se relance tout seul** tant qu'il reste des jours à télécharger (`data/histo/reste.txt`). Une journée qui échoue 8 fois est abandonnée. État lisible dans `data/histo/statut.txt`.
+- **Historique 5 min** : un second travail télécharge Dukascopy par lots de 50 minutes et **se relance tout seul** tant qu'il reste des jours à télécharger (`data/histo/reste.txt`). Une journée qui échoue 15 fois est abandonnée. État lisible dans `data/histo/statut.txt`.
 - Lancement manuel : onglet Actions, « Bilan or », « Run workflow » (mode `histo` pour le seul téléchargement).
 
 ## Mise en route
