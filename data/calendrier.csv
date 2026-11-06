@@ -71,6 +71,8 @@ date,pays,impact,evenement,prevision,precedent
 2026-11-05T03:00:00-05:00,CHF,Low,Unemployment Rate,3.1%,3.1%
 2026-11-05T04:00:00-05:00,EUR,Low,Italian Retail Sales m/m,0.0%,0.3%
 2026-11-05T04:30:00-05:00,GBP,Low,Construction PMI,46.4,46.1
+2026-11-05T04:39:00-05:00,EUR,Low,Spanish 10-y Bond Auction,,4.18|1.6
+2026-11-05T04:55:00-05:00,EUR,Low,French 10-y Bond Auction,,4.93|2.0
 2026-11-05T05:00:00-05:00,EUR,Low,PPI m/m,2.5%,1.9%
 2026-11-05T05:03:00-05:00,EUR,Low,Spanish 10-y Bond Auction,,4.18|1.6
 2026-11-05T05:18:00-05:00,EUR,Low,French 10-y Bond Auction,,4.93|2.0
@@ -112,5 +114,6 @@ date,pays,impact,evenement,prevision,precedent
 2026-11-06T10:00:00-05:00,USD,Medium,Prelim UoM Inflation Expectations,,4.7%
 2026-11-06T11:00:00-05:00,JPY,High,BOJ Gov Ueda Speaks,,
 2026-11-06T12:15:00-05:00,USD,Low,FOMC Member Bowman Speaks,,
+2026-11-06T13:00:00-05:00,USD,Low,FOMC Member Daly Speaks,,
 2026-11-06T15:00:00-05:00,USD,Low,Consumer Credit m/m,13.4B,8.3B
 2026-11-06T16:45:00-05:00,NZD,High,Parliamentary Elections,,
