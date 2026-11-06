@@ -1,8 +1,8 @@
-jours à télécharger : 4243 (10 min max par exécution)
-échelle des prix : 1000 (premier jour 2015-12-21, premier prix 1065.219)
-premier fichier : 2015-12-21 de 2015-12-21 00:00:00+00:00 à 2015-12-21 23:59:00+00:00 UTC, 1440 minutes
-erreur 2015-12-22 : TimeoutError
-erreur 2015-12-24 : TimeoutError
-erreur 2015-12-28 : HTTP 503
-budget de 10 minutes atteint : le reste à la prochaine exécution
-jours ajoutés : 116 ; jours sans données : 0 ; erreurs : 12
+jours à télécharger : 4128 (20 min max par exécution)
+erreur 2015-08-09 : HTTP 503
+erreur 2015-08-10 : TimeoutError
+erreur 2015-08-11 : TimeoutError
+échelle des prix : 1000 (premier jour 2015-08-14, premier prix 1114.359)
+premier fichier : 2015-08-14 de 2015-08-14 00:00:00+00:00 à 2015-08-14 23:59:00+00:00 UTC, 1440 minutes
+budget de 20 minutes atteint : le reste à la prochaine exécution
+jours ajoutés : 226 ; jours sans données : 0 ; erreurs : 158 ; reste à télécharger : 3902
