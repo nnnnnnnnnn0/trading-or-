@@ -95,4 +95,4 @@ jobs:
           reste=$(cat data/histo/reste.txt 2>/dev/null || echo 0)
           ajoutes=$(cat data/histo/ajoutes.txt 2>/dev/null || echo 0)
           echo "reste=$reste ajoutes=$ajoutes"
-          if [ "$reste" -gt 0 ] && [ "$ajoutes" -gt 0 ]; then gh workflow run bilan_or.yml -f mode=histo; fi
+          if [ "$reste" -gt 0 ] && [ "$ajoutes" -gt 0 ]; then gh workflow run bilan_or.yml; fi
