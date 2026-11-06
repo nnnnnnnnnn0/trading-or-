@@ -18,11 +18,11 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score
 from sklearn.preprocessing import StandardScaler
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "backtests"))
 from backtest_or import metriques, fr  # noqa: E402
 
 warnings.filterwarnings("ignore")
-RACINE = Path(__file__).resolve().parent.parent
+RACINE = Path(__file__).resolve().parent.parent.parent
 SORTIE = RACINE / "resultats" / "modele_facteurs_v1.md"
 FRAIS = 0.0005
 SEUIL = 0.05

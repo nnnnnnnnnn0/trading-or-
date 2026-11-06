@@ -21,7 +21,7 @@ from zoneinfo import ZoneInfo
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from backtest_or import metriques, fr, verdict  # noqa: E402
 
-RACINE = Path(__file__).resolve().parent.parent
+RACINE = Path(__file__).resolve().parent.parent.parent
 SORTIE = RACINE / "resultats" / ("backtest_mtf_histo.md" if "--histo" in sys.argv else "backtest_mtf_v1.md")
 TIRAGES = {dt.timedelta(minutes=5): 100}
 PARIS, NY = ZoneInfo("Europe/Paris"), ZoneInfo("America/New_York")

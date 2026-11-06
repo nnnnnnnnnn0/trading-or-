@@ -34,20 +34,20 @@ jobs:
       - name: Historique quotidien de l'or (Alpha Vantage)
         env:
           ALPHAVANTAGE_API_KEY: ${{ secrets.ALPHAVANTAGE_API_KEY }}
-        run: python scripts/fetch_or.py
+        run: python scripts/donnees/fetch_or.py
       - name: Or détaillé (ouverture, plus haut, plus bas, heures)
         continue-on-error: true
-        run: python scripts/fetch_ohlc.py
+        run: python scripts/donnees/fetch_ohlc.py
       - name: Facteurs et calendrier des annonces
         continue-on-error: true
-        run: python scripts/fetch_facteurs.py
+        run: python scripts/donnees/fetch_facteurs.py
       - name: Prédiction du modèle multi-facteurs (journal pour test en conditions réelles)
         continue-on-error: true
         run: |
           pip install --quiet pandas numpy scikit-learn
-          python scripts/modele_facteurs.py --journal
+          python scripts/quotidien/modele_facteurs.py --journal
       - name: Signaux du jour
-        run: python scripts/signaux_or.py
+        run: python scripts/quotidien/signaux_or.py
       - name: Enregistrer
         run: |
           git config user.name "Claude"
@@ -67,7 +67,7 @@ jobs:
       - name: Historique 5 min de l'or (par lots, reprend où il s'est arrêté)
         continue-on-error: true
         timeout-minutes: 50
-        run: python scripts/fetch_histo.py
+        run: python scripts/donnees/fetch_histo.py
       - name: Enregistrer
         if: always()
         run: |

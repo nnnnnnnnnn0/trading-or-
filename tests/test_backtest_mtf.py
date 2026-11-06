@@ -1,6 +1,7 @@
 import sys, unittest, datetime as dt
 from pathlib import Path
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
+for _d in ("donnees", "quotidien", "backtests"):
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts" / _d))
 import backtest_mtf as m
 
 U = dt.timezone.utc

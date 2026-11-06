@@ -12,7 +12,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-RACINE = Path(__file__).resolve().parent.parent
+RACINE = Path(__file__).resolve().parent.parent.parent
 SORTIE = RACINE / "resultats" / "indicateurs_v1.md"
 FRAIS_COTE = 0.00025
 

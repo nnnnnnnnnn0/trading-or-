@@ -5,7 +5,7 @@ import csv, datetime as dt, gzip, io, json, lzma, struct, sys, time, traceback, 
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
-RACINE = Path(__file__).resolve().parent.parent
+RACINE = Path(__file__).resolve().parent.parent.parent
 DOSSIER = RACINE / "data" / "histo"
 DEBUT = dt.date(2012, 1, 1)
 URL = "https://datafeed.dukascopy.com/datafeed/XAUUSD/%04d/%02d/%02d/BID_candles_min_1.bi5"

@@ -4,7 +4,7 @@ import csv, json, sys, datetime, urllib.request
 from urllib.parse import quote
 from pathlib import Path
 
-RACINE = Path(__file__).resolve().parent.parent
+RACINE = Path(__file__).resolve().parent.parent.parent
 JEUX = [("1d", "max", "data/or_ohlc_jour.csv"),
         ("1h", "730d", "data/or_ohlc_1h.csv"),
         ("5m", "60d", "data/or_ohlc_5m.csv")]
