@@ -1,7 +1,7 @@
 """Historique 5 min de l'or au comptant (XAUUSD, prix vendeur) depuis Dukascopy (gratuit, sans clé).
 Reprise automatique : ne retélécharge que les jours manquants. Écrit un fichier de statut lisible.
 Tourne dans GitHub Actions (le réseau y est ouvert)."""
-import csv, datetime as dt, gzip, io, lzma, struct, sys, time, traceback, urllib.error, urllib.request
+import csv, datetime as dt, gzip, io, json, lzma, struct, sys, time, traceback, urllib.error, urllib.request
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
@@ -64,6 +64,10 @@ def main():
     manquants = [DEBUT + dt.timedelta(days=i) for i in range((fin - DEBUT).days + 1)]
     manquants = [j for j in manquants if j.weekday() != 5 and j.isoformat() not in existants]
     manquants = [j for j in manquants if j.isoformat() not in vides()]
+    fichier_echecs = DOSSIER / "echecs.json"
+    echecs = json.loads(fichier_echecs.read_text()) if fichier_echecs.exists() else {}
+    manquants = [j for j in manquants if echecs.get(j.isoformat(), 0) < 8]  # abandon après 8 échecs
+    tous = len(manquants)
     statut.append("jours à télécharger : %d (45 min max par exécution)" % len(manquants))
     manquants = manquants[-3000:]  # les plus récents d'abord ; les exécutions suivantes complètent
     # échelle des prix : testée sur le premier fichier non vide
@@ -81,6 +85,7 @@ def main():
         for jour, brut, err in lots():
             if brut is None:
                 erreurs += 1
+                echecs[jour.isoformat()] = echecs.get(jour.isoformat(), 0) + 1
                 if erreurs <= 3:
                     statut.append("erreur %s : %s" % (jour, err))
                 continue
@@ -119,7 +124,13 @@ def main():
     if vus_vides:
         with open(DOSSIER / "jours_vides.txt", "a") as f:
             f.write("\n".join(vus_vides) + "\n")
-    statut.append("jours ajoutés : %d ; jours sans données : %d ; erreurs : %d" % (len(nouveaux), len(vus_vides), erreurs))
+    for jour in list(nouveaux) + [dt.date.fromisoformat(x) for x in vus_vides]:
+        echecs.pop(jour.isoformat(), None)
+    fichier_echecs.write_text(json.dumps(echecs))
+    reste = tous - len(nouveaux) - len(vus_vides)
+    (DOSSIER / "reste.txt").write_text("%d\n" % reste)
+    (DOSSIER / "ajoutes.txt").write_text("%d\n" % (len(nouveaux) + len(vus_vides)))
+    statut.append("jours ajoutés : %d ; jours sans données : %d ; erreurs : %d ; reste à télécharger : %d" % (len(nouveaux), len(vus_vides), erreurs, reste))
     (DOSSIER / "statut.txt").write_text("\n".join(statut) + "\n")
     print("\n".join(statut))
 

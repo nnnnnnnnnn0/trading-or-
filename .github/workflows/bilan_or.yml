@@ -2,14 +2,19 @@ name: Bilan or
 
 on:
   schedule:
-    - cron: "5 */3 * * *"   # complète l'historique 5 min (temporaire, jusqu'à complétion)
     - cron: "30 6 * * 1-5"   # 06h30 UTC = 07h30 à Paris en hiver (08h30 en été) ; GitHub peut retarder l'exécution
   push:
-    paths: ["scripts/fetch_ohlc.py", "scripts/fetch_facteurs.py", "scripts/modele_facteurs.py", "scripts/fetch_histo.py"]   # se relance quand ce script change
+    paths: ["scripts/**", ".github/workflows/bilan_or.yml"]   # se relance quand le code change
   workflow_dispatch:          # lancement manuel : onglet Actions > Bilan or > Run workflow
+    inputs:
+      mode:
+        description: "histo = seulement le téléchargement de l'historique 5 min"
+        required: false
+        default: "tout"
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: bilan-or
@@ -17,6 +22,7 @@ concurrency:
 
 jobs:
   bilan:
+    if: ${{ inputs.mode != 'histo' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -25,14 +31,14 @@ jobs:
           python-version: "3.12"
       - name: Tests du code
         run: python -m unittest discover -s tests -v
-      - name: Récupérer l'historique de l'or
+      - name: Historique quotidien de l'or (Alpha Vantage)
         env:
           ALPHAVANTAGE_API_KEY: ${{ secrets.ALPHAVANTAGE_API_KEY }}
         run: python scripts/fetch_or.py
-      - name: Récupérer l'or détaillé (ouverture, plus haut, plus bas, heures)
+      - name: Or détaillé (ouverture, plus haut, plus bas, heures)
         continue-on-error: true
         run: python scripts/fetch_ohlc.py
-      - name: Récupérer les facteurs et le calendrier des annonces
+      - name: Facteurs et calendrier des annonces
         continue-on-error: true
         run: python scripts/fetch_facteurs.py
       - name: Prédiction du modèle multi-facteurs (journal pour test en conditions réelles)
@@ -40,17 +46,42 @@ jobs:
         run: |
           pip install --quiet pandas numpy scikit-learn
           python scripts/modele_facteurs.py --journal
-      - name: Historique 5 min de l'or (par lots, reprend où il s'est arrêté)
-        continue-on-error: true
-        timeout-minutes: 55
-        run: python scripts/fetch_histo.py
-      - name: Calculer les signaux
+      - name: Signaux du jour
         run: python scripts/signaux_or.py
-      - name: Enregistrer le rapport
+      - name: Enregistrer
         run: |
           git config user.name "Claude"
           git config user.email "noreply@anthropic.com"
           git add data rapports journal
           git diff --cached --quiet || git commit -m "Bilan automatique"
-          git pull --rebase origin main
-          git push
+          for i in 1 2 3 4 5; do git pull --rebase origin main && git push && break; sleep 8; done
+
+  histo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Historique 5 min de l'or (par lots, reprend où il s'est arrêté)
+        continue-on-error: true
+        timeout-minutes: 50
+        run: python scripts/fetch_histo.py
+      - name: Enregistrer
+        if: always()
+        run: |
+          git config user.name "Claude"
+          git config user.email "noreply@anthropic.com"
+          git add data/histo
+          git diff --cached --quiet || git commit -m "Historique 5 min de l'or"
+          for i in 1 2 3 4 5; do git pull --rebase origin main && git push && break; sleep 8; done
+      - name: Relancer tant qu'il reste des jours à télécharger
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          reste=$(cat data/histo/reste.txt 2>/dev/null || echo 0)
+          ajoutes=$(cat data/histo/ajoutes.txt 2>/dev/null || echo 0)
+          echo "reste=$reste ajoutes=$ajoutes"
+          if [ "$reste" -gt 0 ] && [ "$ajoutes" -gt 0 ]; then gh workflow run bilan_or.yml -f mode=histo; fi
