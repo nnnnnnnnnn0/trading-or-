@@ -1,8 +1,8 @@
-jours à télécharger : 2763 (20 min max par exécution)
-erreur 2012-01-01 : URLError
-échelle des prix : 1000 (premier jour 2012-01-02, premier prix 1565.3)
-premier fichier : 2012-01-02 de 2012-01-02 00:00:00+00:00 à 2012-01-02 23:59:00+00:00 UTC, 1440 minutes
-erreur 2012-01-08 : URLError
-erreur 2012-01-15 : URLError
+jours à télécharger : 2562 (20 min max par exécution)
+erreur 2012-01-01 : HTTP 503
+erreur 2012-01-08 : TimeoutError
+erreur 2012-01-15 : TimeoutError
+échelle des prix : 1000 (premier jour 2012-01-24, premier prix 1679.033)
+premier fichier : 2012-01-24 de 2012-01-24 00:00:00+00:00 à 2012-01-24 23:59:00+00:00 UTC, 1440 minutes
 budget de 20 minutes atteint : le reste à la prochaine exécution
-jours ajoutés : 201 ; jours sans données : 0 ; erreurs : 151 ; reste à télécharger : 2562
+jours ajoutés : 152 ; jours sans données : 0 ; erreurs : 168 ; reste à télécharger : 2410
