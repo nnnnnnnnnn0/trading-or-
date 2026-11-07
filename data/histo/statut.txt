@@ -1,8 +1,8 @@
-jours à télécharger : 2410 (20 min max par exécution)
-échelle des prix : 1000 (premier jour 2012-01-01, premier prix 1564.799)
-premier fichier : 2012-01-01 de 2012-01-01 00:00:00+00:00 à 2012-01-01 23:59:00+00:00 UTC, 1440 minutes
-erreur 2012-02-01 : TimeoutError
-erreur 2012-03-11 : TimeoutError
-erreur 2012-10-18 : TimeoutError
+jours à télécharger : 2230 (20 min max par exécution)
+erreur 2012-02-01 : URLError
+erreur 2012-03-11 : URLError
+erreur 2012-10-18 : URLError
+échelle des prix : 1000 (premier jour 2017-07-10, premier prix 1213.332)
+premier fichier : 2017-07-10 de 2017-07-10 00:00:00+00:00 à 2017-07-10 23:59:00+00:00 UTC, 1440 minutes
 budget de 20 minutes atteint : le reste à la prochaine exécution
-jours ajoutés : 180 ; jours sans données : 0 ; erreurs : 172 ; reste à télécharger : 2230
+jours ajoutés : 337 ; jours sans données : 0 ; erreurs : 143 ; reste à télécharger : 1893
