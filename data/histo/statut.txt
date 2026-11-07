@@ -1,8 +1,8 @@
-jours à télécharger : 652 (20 min max par exécution)
-échelle des prix : 1000 (premier jour 2021-10-28, premier prix 1796.488)
-premier fichier : 2021-10-28 de 2021-10-28 00:00:00+00:00 à 2021-10-28 23:59:00+00:00 UTC, 1440 minutes
-erreur 2023-02-12 : HTTP 503
-erreur 2023-02-16 : HTTP 503
-erreur 2023-03-02 : URLError
+jours à télécharger : 476 (20 min max par exécution)
+erreur 2023-02-12 : TimeoutError
+erreur 2023-02-16 : TimeoutError
+erreur 2023-03-02 : HTTP 503
+échelle des prix : 1000 (premier jour 2023-07-27, premier prix 1971.905)
+premier fichier : 2023-07-27 de 2023-07-27 00:00:00+00:00 à 2023-07-27 23:59:00+00:00 UTC, 1440 minutes
 budget de 20 minutes atteint : le reste à la prochaine exécution
-jours ajoutés : 176 ; jours sans données : 0 ; erreurs : 176 ; reste à télécharger : 476
+jours ajoutés : 128 ; jours sans données : 0 ; erreurs : 192 ; reste à télécharger : 348
