@@ -1,2 +1,0 @@
-id,date_signal,strategie,niveau,sens,entree,stop,objectif,horizon,confiance,statut,prix_sortie,date_sortie,motif_sortie,frais_nuit,commentaire
-1,2026-11-02,Cassure de 20 jours,A,Short,3911.65,4137.50,,swing,,À activer,,,,,Entrée réelle = ouverture du 3 nov (à compléter). Demi-taille si jour d'événement majeur. À vérifier sur TradingView.

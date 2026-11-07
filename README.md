@@ -1,32 +1,39 @@
-# trading-or : paper trading sur l'or
+# trading-or : une seule stratégie sur l'or, testée sur le maximum de données
 
-Projet de test de stratégies sur l'or, **en ordres fictifs, sans argent réel**. Ce n'est ni un conseil en investissement ni une prévision : un résultat fictif surestime presque toujours le réel (pas de peur, pas de glissement de prix). Un bon backtest ne prouve rien sur l'avenir.
+**Paper trading uniquement, aucun argent réel. Ce dépôt n'est ni un conseil en investissement ni une prévision.** Un bon backtest ne prouve rien sur l'avenir ; un mauvais est une information utile.
+
+Le dépôt ne contient que ce qu'il faut pour récupérer les données et tester la stratégie « Régime or v1 » (règles figées avant tout test dans `regles/strategie_regime_v1.md`, aucun paramètre ajusté après coup).
 
 ## Organisation
-| Dossier | Contenu |
+| Chemin | Contenu |
 | --- | --- |
-| `regles/` | règles figées (`strategies_or.md`), idées en attente, idée de portefeuille (`portefeuille.md`) |
-| `scripts/donnees/` | téléchargements : `fetch_or.py` (Alpha Vantage), `fetch_ohlc.py` (GC=F jour / 1 h / 5 min), `fetch_facteurs.py` (dollar, taux, argent, VIX, S&P, pétrole, calendrier), `fetch_histo.py` (historique 5 min de l'or au comptant, Dukascopy) |
-| `scripts/quotidien/` | ce qui tourne chaque jour : `signaux_or.py` (signaux, rapport), `modele_facteurs.py` (probabilité du lendemain, journal de prédictions) |
-| `scripts/backtests/` | recherches et backtests : règles figées, multi-échelles, indicateurs, Ichimoku, intraday, récurrences |
-| `data/` | données téléchargées (CSV) ; `data/histo/` = historique 5 min compressé par année |
-| `resultats/` | rapports des backtests (un fichier par étude) |
-| `rapports/` | rapport quotidien des signaux |
-| `journal/` | ordres fictifs (`journal_or.csv`), leçons (`lecons.csv`), prédictions du modèle (`predictions_modele.csv`) |
-| `tests/` | tests sur des données inventées |
-| `.github/workflows/bilan_or.yml` | automatisation (voir ci-dessous) |
+| `regles/strategie_regime_v1.md` | les règles figées, les sources, le plan de test et les critères de réussite |
+| `scripts/donnees/fetch_jour.py` | or (GC=F) et dollar (DXY) via Yahoo, taux réels américains 10 ans via US Treasury → `data/or_jour.csv`, `data/dollar_dxy.csv`, `data/taux_reels_10ans.csv` |
+| `scripts/donnees/fetch_histo.py` | or au comptant XAUUSD, minutes Dukascopy agrégées en 5 min, par lots → `data/histo/xauusd_5m_AAAA.csv.gz` (reprend là où il s'est arrêté ; état dans `data/histo/statut.txt`, jours restants dans `reste.txt`) |
+| `scripts/backtests/backtest_regime.py` | le backtest (module A : régime journalier ; module B : hypothèse H1 sur le 5 min) et le signal du jour |
+| `tests/` | tests sur données inventées, sans réseau |
+| `resultats/regime_v1.md` | rapport du backtest (créé au premier lancement) |
+| `.github/workflows/donnees.yml` | téléchargement automatique des données |
 
-## Automatisation (GitHub Actions, workflow « Bilan or »)
-- **Chaque jour ouvré à 6 h 30 UTC** et à chaque modification du code : tests, téléchargement des données, signaux du jour, prédiction du modèle, enregistrement.
-- **Historique 5 min** : un second travail télécharge Dukascopy par lots de 50 minutes et **se relance tout seul** tant qu'il reste des jours à télécharger (`data/histo/reste.txt`). Une journée qui échoue 15 fois est abandonnée. État lisible dans `data/histo/statut.txt`.
-- **Minutes gratuites GitHub : 2 000 par mois pour un dépôt privé.** Quand elles sont épuisées, tous les lancements échouent en 2 secondes (« spending limit needs to be increased »). Le téléchargement de l'historique consomme environ 25 minutes par lot ; il reprend de lui-même dès que des minutes sont de nouveau disponibles (début de cycle de facturation, dépôt public, ou limite de dépense relevée).
-- Lancement manuel : onglet Actions, « Bilan or », « Run workflow » (mode `histo` pour le seul téléchargement).
+## Utilisation
+```
+python -m unittest discover -s tests          # tests
+python scripts/backtests/backtest_regime.py   # rapport complet -> resultats/regime_v1.md
+python scripts/backtests/backtest_regime.py --signal   # position conseillée à la dernière clôture (fictive)
+```
+Il faut `pandas` et `numpy`. Le backtest utilise les données déjà présentes dans `data/` : le réseau n'est pas nécessaire.
 
-## Mise en route
-1. Dépôt **privé**. Clé Alpha Vantage : `Settings > Secrets and variables > Actions`, nom `ALPHAVANTAGE_API_KEY`. Ne l'écris jamais dans un fichier.
-2. Onglet Actions : active les workflows si GitHub le demande.
+## Téléchargement automatique (GitHub Actions, workflow « Données »)
+- Chaque jour ouvré à 6 h 30 UTC et à chaque modification de `scripts/donnees/` : données quotidiennes (travail `jour`) et historique 5 min (travail `histo`).
+- Le travail `histo` télécharge par lots de 20 minutes et **se relance tout seul** tant qu'il reste des jours (`data/histo/reste.txt`). Un jour qui échoue 15 fois est abandonné et noté dans `data/histo/echecs.json`.
+- Lancement manuel : onglet Actions, « Données », « Run workflow » (mode `tout`, `jour` ou `histo`).
+- **Minutes gratuites : 2 000 par mois pour un dépôt privé, illimitées pour un dépôt public.** Privé et minutes épuisées : tous les lancements échouent en 2 secondes.
+- Dépôt public : le contenu (code, données, résultats) est lisible par tous. Aucune clé ni mot de passe n'est nécessaire ni ne doit être écrit dans ce dépôt. Les données viennent de sources gratuites (Yahoo, Dukascopy, US Treasury) dont les conditions d'usage peuvent limiter leur redistribution.
 
-## Limites connues
-- Données gratuites non officielles (Yahoo, Dukascopy, flux de calendrier) : elles peuvent changer ou tomber en panne.
-- Futures GC=F et or au comptant (XAUUSD) diffèrent légèrement.
-- Le calendrier des annonces n'existe que depuis novembre 2026.
+## Ce que les études précédentes ont montré (supprimées du dépôt, récupérables dans l'historique git, par exemple le commit `0c9719b`)
+Aucun avantage durable n'a été trouvé : 4 règles figées, stratégie multi-échelles, modèle multi-facteurs (AUC ≈ 0,51), récurrences journalières (112 essais), 17 indicateurs (34 essais), combinaisons Ichimoku (32 essais), 15 stratégies intraday (39 essais). Environ 250 essais au total, d'où la prudence sur les résultats « trop beaux » (Deflated Sharpe). Garder l'or battait presque tout sur 2021-2026.
+
+## Limites
+- Futures GC=F (jour) et or au comptant XAUUSD (5 min) diffèrent légèrement.
+- Frais et financement estimés, pas d'écart de prix réel de courtier.
+- Sources gratuites non officielles : elles peuvent changer ou tomber en panne.

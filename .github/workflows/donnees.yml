@@ -1,0 +1,81 @@
+name: Données
+
+# Ce workflow ne fait que récupérer les données (rien d'autre dans le dépôt) :
+#   - jour : or (GC=F), dollar (DXY) et taux réels américains 10 ans, séances quotidiennes
+#   - histo : or au comptant XAUUSD, minutes Dukascopy agrégées en 5 min, par lots de 20 minutes ; il se relance tout seul
+#     tant qu'il reste des jours à télécharger
+on:
+  schedule:
+    - cron: "30 6 * * 1-5"   # chaque jour ouvré à 06h30 UTC ; GitHub peut retarder l'exécution
+  push:
+    paths: ["scripts/donnees/**", ".github/workflows/donnees.yml"]
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "tout, jour (données quotidiennes seulement) ou histo (minutes seulement)"
+        required: false
+        default: "tout"
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: donnees
+  cancel-in-progress: ${{ github.event_name == 'push' }}   # un nouveau push remplace l'exécution en cours ; la boucle de téléchargement n'est jamais interrompue
+
+jobs:
+  jour:
+    if: ${{ inputs.mode != 'histo' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Tests du code
+        run: |
+          pip install --quiet pandas numpy
+          python -m unittest discover -s tests -v
+      - name: Données quotidiennes (or, dollar, taux réels)
+        run: python scripts/donnees/fetch_jour.py
+      - name: Enregistrer
+        if: always()
+        run: |
+          git config user.name "Claude"
+          git config user.email "noreply@anthropic.com"
+          git add data/*.csv
+          git diff --cached --quiet || git commit -m "Données quotidiennes"
+          for i in 1 2 3 4 5; do git pull --rebase --autostash origin main && git push && break; sleep 8; done
+
+  histo:
+    if: ${{ inputs.mode != 'jour' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Historique 5 min de l'or (par lots, reprend où il s'est arrêté)
+        continue-on-error: true
+        timeout-minutes: 40
+        run: python scripts/donnees/fetch_histo.py
+      - name: Enregistrer
+        if: always()
+        run: |
+          git config user.name "Claude"
+          git config user.email "noreply@anthropic.com"
+          git add data/histo
+          git diff --cached --quiet || git commit -m "Historique 5 min de l'or"
+          for i in 1 2 3 4 5; do git pull --rebase --autostash origin main && git push && break; sleep 8; done
+      - name: Relancer tant qu'il reste des jours à télécharger
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          reste=$(cat data/histo/reste.txt 2>/dev/null || echo 0)
+          ajoutes=$(cat data/histo/ajoutes.txt 2>/dev/null || echo 0)
+          echo "reste=$reste ajoutes=$ajoutes"
+          if [ "$reste" -gt 0 ] && [ "$ajoutes" -gt 0 ]; then gh workflow run donnees.yml -f mode=histo; fi
