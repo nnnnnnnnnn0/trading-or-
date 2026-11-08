@@ -103,7 +103,7 @@ def simuler(d, j, sens):
     nuits = int(jour_date(d.ts[sortie]) - jour_date(d.ts[i]))
     brut = sg * (px - entree) / atr
     frais = (FRAIS_AR + FRAIS_NUIT * nuits) * entree / atr
-    return {"conflit": False, "date": pd.Timestamp(d.ts[i]), "sens": sg, "brut": brut, "net": brut - frais, "type": type_, "sortie_idx": sortie,
+    return {"conflit": False, "j": j, "date": pd.Timestamp(d.ts[i]), "sens": sg, "brut": brut, "net": brut - frais, "type": type_, "sortie_idx": sortie,
             "debut_prochaine": d.e[min(fin_j, d.n - 1)]}
 
 
