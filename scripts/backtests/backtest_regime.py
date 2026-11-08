@@ -231,8 +231,8 @@ def segments(ouvertures, h1=13, h2=21):
     for i, j in enumerate(jours[:-1]):
         a, b, c_ = prix.get((j, h1)), prix.get((j, h2)), prix.get((jours[i + 1], h1))
         if a and b and c_ and (jours[i + 1] - j).days <= 4:
-            lignes.append((pd.Timestamp(j), b / a - 1, c_ / b - 1))
-    return pd.DataFrame(lignes, columns=["date", "us", "hors_us"]).set_index("date")
+            lignes.append((pd.Timestamp(j), b / a - 1, c_ / b - 1, (jours[i + 1] - j).days))
+    return pd.DataFrame(lignes, columns=["date", "us", "hors_us", "nuits"]).set_index("date")
 
 
 def nw_t(x, lag=5):
