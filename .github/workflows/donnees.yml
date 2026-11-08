@@ -6,7 +6,7 @@ name: Données
 #     tant qu'il reste des jours à télécharger
 on:
   schedule:
-    - cron: "30 6 * * 1-5"   # chaque jour ouvré à 06h30 UTC ; GitHub peut retarder l'exécution
+    - cron: "30 6 * * 1-6"   # du lundi au samedi à 06h30 UTC (récupère la veille, vendredi compris) ; GitHub peut retarder l'exécution
   push:
     paths: ["scripts/donnees/**", ".github/workflows/donnees.yml"]
   workflow_dispatch:

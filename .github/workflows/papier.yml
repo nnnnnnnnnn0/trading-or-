@@ -1,0 +1,42 @@
+name: Paper trading 5 min
+
+# Après chaque téléchargement de données, rejoue le paper trading (28 stratégies + témoin) et met à jour le journal.
+# Le calcul est déterministe : il repart toujours du 9 novembre 2026 et donne le même journal, plus les nouveaux jours.
+on:
+  workflow_run:
+    workflows: ["Données"]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: papier
+  cancel-in-progress: true
+
+jobs:
+  papier:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Tests du code
+        run: |
+          pip install --quiet pandas numpy
+          python -m unittest discover -s tests
+      - name: "Paper trading : ordres de la veille et journal"
+        run: python scripts/papier/moteur.py
+      - name: Enregistrer
+        run: |
+          git config user.name "Claude"
+          git config user.email "noreply@anthropic.com"
+          git add journal
+          git diff --cached --quiet || git commit -m "Journal du paper trading"
+          for i in 1 2 3 4 5; do git pull --rebase --autostash origin main && git push && break; sleep 8; done

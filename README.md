@@ -1,30 +1,33 @@
-# trading-or : une seule stratégie sur l'or, testée sur le maximum de données
+# trading-or : stratégies sur l'or, testées sur le maximum de données et en paper trading quotidien
 
 **Paper trading uniquement, aucun argent réel. Ce dépôt n'est ni un conseil en investissement ni une prévision.** Un bon backtest ne prouve rien sur l'avenir ; un mauvais est une information utile.
 
-Le dépôt ne contient que ce qu'il faut pour récupérer les données et tester la stratégie « Régime or v1 » (règles figées avant tout test dans `regles/strategie_regime_v1.md`, aucun paramètre ajusté après coup).
+Le dépôt contient ce qu'il faut pour récupérer les données, tester des stratégies aux règles figées avant tout test (jamais ajustées après coup) et suivre un **paper trading quotidien sur graphique 5 min** (28 stratégies + un témoin hasard).
 
 ## Organisation
 | Chemin | Contenu |
 | --- | --- |
-| `regles/strategie_regime_v1.md` | les règles figées, les sources, le plan de test et les critères de réussite |
+| `regles/` | règles figées : `strategie_regime_v1.md`, `strategie_nuit_v1.md`, `strategie_compression_v1.md`, et `papier_5m_v1.md` (les 28 stratégies du paper trading) |
 | `scripts/donnees/fetch_jour.py` | or (GC=F) et dollar (DXY) via Yahoo, taux réels américains 10 ans via US Treasury → `data/or_jour.csv`, `data/dollar_dxy.csv`, `data/taux_reels_10ans.csv` |
 | `scripts/donnees/fetch_histo.py` | or au comptant XAUUSD, minutes Dukascopy agrégées en 5 min, par lots → `data/histo/xauusd_5m_AAAA.csv.gz` (reprend là où il s'est arrêté ; état dans `data/histo/statut.txt`, jours restants dans `reste.txt`) |
-| `scripts/backtests/backtest_regime.py` | le backtest (module A : régime journalier ; module B : hypothèse H1 sur le 5 min) et le signal du jour |
+| `scripts/backtests/` | backtests : `backtest_regime.py` (régime journalier, hypothèse H1), `backtest_nuit.py`, `backtest_compression.py`, `analyse_gagnants.py` (recherche de conditions avec contrôle et test de permutation) |
+| `scripts/papier/` | paper trading 5 min : `indicateurs.py`, `strategies.py` (28 stratégies + témoin), `moteur.py` (ordres, journal, classement) |
+| `journal/` | **le paper trading** : `ordres.csv` (tous les ordres), `jours/AAAA-MM-JJ.md` (ordres du jour en heure de Paris, gagné / perdu), `classement.md` (cumul par stratégie) |
 | `tests/` | tests sur données inventées, sans réseau |
-| `resultats/regime_v1.md` | rapport du backtest (créé au premier lancement) |
-| `.github/workflows/donnees.yml` | téléchargement automatique des données |
+| `resultats/` | rapports : `regime_v1.md`, `nuit_v1.md`, `compression_v1.md`, `analyse_gagnants.md`, `papier_histo.md` (les 28 stratégies rejouées une fois sur 14 ans) |
+| `.github/workflows/` | `donnees.yml` (téléchargement des données) et `papier.yml` (paper trading, se lance après chaque téléchargement) |
 
 ## Utilisation
 ```
 python -m unittest discover -s tests          # tests
 python scripts/backtests/backtest_regime.py   # rapport complet -> resultats/regime_v1.md
 python scripts/backtests/backtest_regime.py --signal   # position conseillée à la dernière clôture (fictive)
+python scripts/papier/moteur.py               # paper trading : recalcule journal/ (départ le 9 nov 2026)
 ```
 Il faut `pandas` et `numpy`. Le backtest utilise les données déjà présentes dans `data/` : le réseau n'est pas nécessaire.
 
 ## Téléchargement automatique (GitHub Actions, workflow « Données »)
-- Chaque jour ouvré à 6 h 30 UTC et à chaque modification de `scripts/donnees/` : données quotidiennes (travail `jour`) et historique 5 min (travail `histo`).
+- Du lundi au samedi à 6 h 30 UTC et à chaque modification de `scripts/donnees/` : données quotidiennes (travail `jour`) et historique 5 min (travail `histo`). Le workflow « Paper trading 5 min » se lance ensuite et met `journal/` à jour avec les ordres de la veille (le paper trading est donc **différé d'un jour**).
 - Le travail `histo` télécharge par lots de 20 minutes et **se relance tout seul** tant qu'il reste des jours (`data/histo/reste.txt`). Un jour qui échoue 15 fois est abandonné et noté dans `data/histo/echecs.json`.
 - Lancement manuel : onglet Actions, « Données », « Run workflow » (mode `tout`, `jour` ou `histo`).
 - **Minutes gratuites : 2 000 par mois pour un dépôt privé, illimitées pour un dépôt public.** Privé et minutes épuisées : tous les lancements échouent en 2 secondes.
