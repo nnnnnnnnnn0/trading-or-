@@ -1,5 +1,4 @@
 jours à télécharger : 3 (20 min max par exécution)
-erreur 2024-10-31 : HTTP 503
-erreur 2024-11-15 : HTTP 503
-erreur 2024-11-21 : HTTP 503
-jours ajoutés : 0 ; jours sans données : 0 ; erreurs : 3 ; reste à télécharger : 3
+échelle des prix : 1000 (premier jour 2024-10-31, premier prix 2785.274)
+premier fichier : 2024-10-31 de 2024-10-31 00:00:00+00:00 à 2024-10-31 23:59:00+00:00 UTC, 1440 minutes
+jours ajoutés : 3 ; jours sans données : 0 ; erreurs : 0 ; reste à télécharger : 0
