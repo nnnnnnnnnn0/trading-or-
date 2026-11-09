@@ -97,9 +97,14 @@ def taux_reels():
     print("OK taux_reels_10ans.csv", len(lignes), lignes[0][0], lignes[-1][0])
 
 
+AUTRES = {"SI=F": "marche_argent.csv", "GDX": "marche_mineurs_or.csv", "^GSPC": "marche_sp500.csv", "^VIX": "marche_vix.csv",
+          "^TNX": "marche_taux10ans.csv", "TLT": "marche_obligations_tlt.csv", "HG=F": "marche_cuivre.csv", "CL=F": "marche_petrole.csv"}
+
+
 def main():
-    for nom, f in (("or", lambda: yahoo("GC=F", "or_jour.csv")), ("dollar", lambda: yahoo("DX-Y.NYB", "dollar_dxy.csv")),
-                   ("taux réels", taux_reels)):
+    taches = [("or", lambda: yahoo("GC=F", "or_jour.csv")), ("dollar", lambda: yahoo("DX-Y.NYB", "dollar_dxy.csv")), ("taux réels", taux_reels)]
+    taches += [(sym, (lambda s=sym, f=fich: yahoo(s, f))) for sym, fich in AUTRES.items()]
+    for nom, f in taches:
         try:
             f()
         except Exception as e:  # noqa: BLE001
