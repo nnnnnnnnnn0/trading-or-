@@ -7,14 +7,14 @@ Le dépôt contient ce qu'il faut pour récupérer les données, tester des stra
 ## Organisation
 | Chemin | Contenu |
 | --- | --- |
-| `regles/` | règles figées : `strategie_regime_v1.md`, `strategie_nuit_v1.md`, `strategie_compression_v1.md`, `sessions_5m_v1.md` (24 stratégies par session), `apres_impots_v1.md` (achat seulement après impôts), `marches_croises_v1.md` (12 règles sur d'autres marchés), `montecarlo_intraday_v1.md` (intraday avec simulation Monte Carlo) et `papier_5m_v1.md` (les 28 stratégies du paper trading) |
+| `regles/` | règles figées : `strategie_regime_v1.md`, `strategie_nuit_v1.md`, `strategie_compression_v1.md`, `sessions_5m_v1.md` (24 stratégies par session), `apres_impots_v1.md` (achat seulement après impôts), `marches_croises_v1.md` (12 règles sur d'autres marchés), `montecarlo_intraday_v1.md` et `montecarlo_intraday_v2.md` (intraday avec simulation Monte Carlo ; la v2 résume la recherche sur l'indicateur) et `papier_5m_v1.md` (les 28 stratégies du paper trading) |
 | `scripts/donnees/fetch_jour.py` | or (GC=F), dollar (DXY), argent, mineurs d'or (GDX), S&P 500, VIX, taux 10 ans, TLT, cuivre et pétrole via Yahoo, taux réels américains 10 ans via US Treasury → `data/*.csv` |
 | `scripts/donnees/fetch_histo.py` | or au comptant XAUUSD, minutes Dukascopy agrégées en 5 min, par lots → `data/histo/xauusd_5m_AAAA.csv.gz` (reprend là où il s'est arrêté ; état dans `data/histo/statut.txt`, jours restants dans `reste.txt`) |
-| `scripts/backtests/` | backtests : `backtest_regime.py` (régime journalier, hypothèse H1), `backtest_nuit.py`, `backtest_compression.py`, `backtest_sessions.py`, `backtest_apres_impots.py`, `backtest_marches.py`, `backtest_montecarlo.py` (intraday Monte Carlo), `analyse_gagnants.py` (recherche de conditions avec contrôle et test de permutation) |
+| `scripts/backtests/` | backtests : `backtest_regime.py` (régime journalier, hypothèse H1), `backtest_nuit.py`, `backtest_compression.py`, `backtest_sessions.py`, `backtest_apres_impots.py`, `backtest_marches.py`, `backtest_montecarlo.py` et `backtest_montecarlo_v2.py` (intraday Monte Carlo), `analyse_gagnants.py` (recherche de conditions avec contrôle et test de permutation) |
 | `scripts/papier/` | paper trading 5 min : `indicateurs.py`, `strategies.py` (28 stratégies + témoin), `moteur.py` (ordres, journal, classement) |
 | `journal/` | **le paper trading** : `ordres.csv` (tous les ordres), `jours/AAAA-MM-JJ.md` (ordres du jour en heure de Paris, gagné / perdu), `classement.md` (cumul par stratégie) |
 | `tests/` | tests sur données inventées, sans réseau |
-| `resultats/` | rapports : `regime_v1.md`, `nuit_v1.md`, `compression_v1.md`, `sessions_v1.md`, `apres_impots_v1.md`, `marches_croises_v1.md`, `montecarlo_intraday_v1.md`, `analyse_gagnants.md`, `papier_histo.md` (les 28 stratégies rejouées une fois sur 14 ans) |
+| `resultats/` | rapports : `regime_v1.md`, `nuit_v1.md`, `compression_v1.md`, `sessions_v1.md`, `apres_impots_v1.md`, `marches_croises_v1.md`, `montecarlo_intraday_v1.md`, `montecarlo_intraday_v2.md`, `analyse_gagnants.md`, `papier_histo.md` (les 28 stratégies rejouées une fois sur 14 ans) |
 | `.github/workflows/` | `donnees.yml` (téléchargement des données) et `papier.yml` (paper trading, se lance après chaque téléchargement) |
 
 ## Utilisation
@@ -34,7 +34,7 @@ Il faut `pandas` et `numpy`. Le backtest utilise les données déjà présentes 
 - Dépôt public : le contenu (code, données, résultats) est lisible par tous. Aucune clé ni mot de passe n'est nécessaire ni ne doit être écrit dans ce dépôt. Les données viennent de sources gratuites (Yahoo, Dukascopy, US Treasury) dont les conditions d'usage peuvent limiter leur redistribution.
 
 ## Ce que les études précédentes ont montré (supprimées du dépôt, récupérables dans l'historique git, par exemple le commit `0c9719b`)
-Aucun avantage durable n'a été trouvé : 4 règles figées, stratégie multi-échelles, modèle multi-facteurs (AUC ≈ 0,51), récurrences journalières (112 essais), 17 indicateurs (34 essais), combinaisons Ichimoku (32 essais), 15 stratégies intraday (39 essais). Environ 350 essais au total (dont 28 stratégies 5 min, 24 stratégies de sessions, 4 règles après impôts, 12 règles sur d'autres marchés et 3 variantes intraday Monte Carlo, toutes sans avantage), d'où la prudence sur les résultats « trop beaux » (Deflated Sharpe). Garder l'or battait presque tout sur 2021-2026.
+Aucun avantage durable n'a été trouvé : 4 règles figées, stratégie multi-échelles, modèle multi-facteurs (AUC ≈ 0,51), récurrences journalières (112 essais), 17 indicateurs (34 essais), combinaisons Ichimoku (32 essais), 15 stratégies intraday (39 essais). Environ 358 essais au total (dont 28 stratégies 5 min, 24 stratégies de sessions, 4 règles après impôts, 12 règles sur d'autres marchés, 3 variantes intraday Monte Carlo v1 et 5 variantes Confluence Monte Carlo v2, toutes sans avantage), d'où la prudence sur les résultats « trop beaux » (Deflated Sharpe). Garder l'or battait presque tout sur 2021-2026.
 
 ## Limites
 - Futures GC=F (jour) et or au comptant XAUUSD (5 min) diffèrent légèrement.

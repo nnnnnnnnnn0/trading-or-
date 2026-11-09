@@ -273,8 +273,8 @@ def rapport(n_boot=10000, n_hasard=100):
          "Or XAUUSD, barres 5 min Dukascopy 2012-2026 ; frais de base 0,02 % l'aller-retour (stress 0,05 %), risque 0,5 % du capital par trade (1 R = distance du stop, 1,5 ATR horaire). "
          "Développement 2012-2019, validation 2020-2026.", "",
          "## Verdict", "",
-         ("**F passe les %d critères figés.** Cela reste un résultat de backtest : à confirmer en avant avant de lui faire confiance." % nb if reussis else
-          "**F ne passe pas tous les critères figés (%d sur %d réussis) : elle n'est pas « solide » au sens que nous avions fixé.** Les chiffres sont publiés tels quels, sans retouche de la règle." % (
+         ("**F passe les %d lignes de critères figés.** Cela reste un résultat de backtest : à confirmer en avant avant de lui faire confiance." % nb if reussis else
+          "**F ne passe pas tous les critères figés (%d ligne(s) réussie(s) sur %d ; le critère 1 compte pour deux lignes, développement et validation) : elle n'est pas « solide » au sens que nous avions fixé.** Les chiffres sont publiés tels quels, sans retouche de la règle." % (
               sum(1 for c in crit if c[1]), nb)),
          "", "| Critère (figé avant le test) | Résultat | Détail |", "|---|---|---|"]
     for nom, ok, det in crit:
