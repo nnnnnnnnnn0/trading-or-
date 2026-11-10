@@ -1,5 +1,7 @@
 # Stratégie « Monte Carlo swing » v1 (5 séances) : règles figées avant le test (9 nov 2026)
 
+**Statut (10 nov 2026) : règles proposées et figées, test NON lancé.** Elles prolongent `regles/continuation_monte_carlo_v3.md` (dont les durées de 3 et 5 jours utilisent un cône de 10 heures, alors que l'horizon de simulation devrait égaler la durée de détention). À lancer seulement si la v3 ne suffit pas à répondre à la question.
+
 ## Pourquoi
 Les tests intraday (v1, v2, v3) butent sur les frais : le gain moyen brut par trade est de l'ordre de quelques points de base, comme les frais. En détenant plusieurs jours, les mêmes frais pèsent beaucoup moins par rapport au mouvement attendu. On teste donc l'idée « tendance + cône Monte Carlo » sur **5 séances** (les indicateurs Monte Carlo cités dans `regles/montecarlo_intraday_v2.md` sont décrits comme plus adaptés au court et moyen terme qu'au scalp ; l'horizon de simulation doit être égal à la durée de détention).
 
@@ -29,7 +31,7 @@ Or XAUUSD, barres 5 min Dukascopy 2012-2026, regroupées en **séances de 22:00 
 ## Critères pour dire « solide » (tous exigés, pour S1)
 1. Gain net moyen par trade (en % du prix) > 0 avec t (Newey-West) ≥ 2 en **développement (2012-2019)** et en **validation (2020-2026)**.
 2. Au moins 100 trades et 60 % d'années positives (années avec au moins 10 trades).
-3. Deflated Sharpe ≥ 0,95 avec **5 essais** (aussi donné avec 367 essais cumulés dans le dépôt).
+3. Deflated Sharpe ≥ 0,95 avec **5 essais** (aussi donné avec 372 essais cumulés dans le dépôt : 367 après la v3, plus 5).
 4. Rendement annuel après impôts > 0.
 5. **S1 fait mieux que S2** (gain net moyen par trade) en développement et en validation (le Monte Carlo apporte quelque chose en plus de la tendance).
 6. **S1 fait mieux que le témoin hasard** en développement et en validation.
@@ -40,6 +42,6 @@ Or XAUUSD, barres 5 min Dukascopy 2012-2026, regroupées en **séances de 22:00 
 - 10 000 rééchantillonnages des trades de S1 ; 100 autres tirages du témoin.
 - **La probabilité P_up annoncée prédit-elle quelque chose ?** Pour toutes les séances : rendement des 5 séances suivantes par tranche de P_up.
 
-Paramètres fixés avant le test, non ajustés ensuite. Test lancé une seule fois. Essais cumulés après les deux tests : environ 367.
+Paramètres fixés avant le test, non ajustés ensuite. Test lancé une seule fois. Essais cumulés après ce test : environ 372.
 
 Un bon backtest ne prouve rien sur l'avenir ; un mauvais est une information utile.
