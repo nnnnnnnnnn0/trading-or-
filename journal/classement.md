@@ -1,39 +1,39 @@
 # Classement cumulé des stratégies (paper trading 5 min)
 
-Du 2026-11-09 au 2026-11-19 23:55 UTC (8 jours de bourse). **Aucune conclusion avant au moins 100 ordres par stratégie, t ≥ 2 et Deflated Sharpe ≥ 0,95.** Avec 28 stratégies, quelques-unes sembleront bonnes par chance : compare toujours au **témoin hasard** (n° 0).
+Du 2026-11-09 au 2026-11-20 23:55 UTC (9 jours de bourse). **Aucune conclusion avant au moins 100 ordres par stratégie, t ≥ 2 et Deflated Sharpe ≥ 0,95.** Avec 28 stratégies, quelques-unes sembleront bonnes par chance : compare toujours au **témoin hasard** (n° 0).
 
 R = risque d'un trade (2 × ATR). « R net » = après frais de base (0,02 %) ; « R stress » = frais de 0,05 %. Compte fictif de 10 000 $, risque 50 $ par ordre.
 
 | N° | Stratégie | Famille | Ordres | Par jour de bourse | Gagnants | R brut moyen (sans frais) | R net moyen | t | R net cumulé | R stress cumulé | Gain net $ | Deflated Sharpe (28 essais) |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 17 | Cassure avec volume | tendance | 15 | 1,9 | 60 % | 0,726 | 0,636 | 1,7 | 9,5 | 7,5 | 477 | — |
-| 6 | Ichimoku nuage | tendance | 30 | 3,8 | 53 % | 0,365 | 0,271 | 1,1 | 8,1 | 3,9 | 407 | 0,17 |
-| 11 | Cassure ouverture Londres | tendance | 14 | 1,8 | 50 % | 0,365 | 0,268 | 0,7 | 3,7 | 1,7 | 187 | — |
-| 12 | Cassure ouverture New York | tendance | 15 | 1,9 | 53 % | 0,328 | 0,261 | 0,7 | 3,9 | 2,4 | 196 | — |
-| 13 | Cassure de la veille | tendance | 11 | 1,4 | 45 % | 0,269 | 0,198 | 0,5 | 2,2 | 1,0 | 109 | — |
-| 9 | Heikin-Ashi | tendance | 74 | 9,2 | 47 % | 0,208 | 0,118 | 0,8 | 8,7 | -1,4 | 435 | 0,10 |
-| 2 | Repli sur EMA 50 | tendance | 28 | 3,5 | 46 % | 0,189 | 0,089 | 0,3 | 2,5 | -1,7 | 125 | — |
-| 15 | Compression Bollinger | tendance | 19 | 2,4 | 47 % | 0,177 | 0,069 | 0,2 | 1,3 | -1,8 | 65 | — |
-| 19 | RSI 2 Connors | retour | 43 | 5,4 | 63 % | 0,116 | 0,025 | 0,2 | 1,1 | -4,8 | 53 | 0,03 |
-| 16 | Momentum ROC 12 | tendance | 59 | 7,4 | 42 % | 0,101 | 0,008 | 0,0 | 0,5 | -7,8 | 23 | 0,02 |
-| 10 | Aroon 25 | tendance | 31 | 3,9 | 39 % | 0,098 | -0,001 | -0,0 | -0,0 | -4,6 | -1 | 0,02 |
-| 5 | Donchian 48 | tendance | 37 | 4,6 | 38 % | 0,033 | -0,058 | -0,3 | -2,1 | -7,2 | -107 | 0,01 |
-| 20 | Retour Bollinger | retour | 63 | 7,9 | 57 % | 0,005 | -0,085 | -0,8 | -5,4 | -13,8 | -268 | 0,00 |
-| 21 | Stochastique 14-3-3 | retour | 75 | 9,4 | 55 % | -0,034 | -0,127 | -1,3 | -9,5 | -20,0 | -477 | 0,00 |
-| 18 | RSI 14 | retour | 34 | 4,2 | 53 % | -0,042 | -0,130 | -0,9 | -4,4 | -8,9 | -221 | 0,00 |
-| 22 | CCI 20 | retour | 97 | 12,1 | 53 % | -0,041 | -0,134 | -1,5 | -13,0 | -26,5 | -651 | 0,00 |
-| 25 | Z-score 50 | retour | 45 | 5,6 | 51 % | -0,049 | -0,139 | -1,1 | -6,3 | -12,3 | -313 | 0,00 |
-| 24 | VWAP 2 écarts-types | retour | 35 | 4,4 | 54 % | -0,050 | -0,147 | -1,0 | -5,1 | -10,2 | -257 | 0,00 |
-| 4 | Supertrend 10x3 | tendance | 30 | 3,8 | 33 % | -0,052 | -0,150 | -0,6 | -4,5 | -8,9 | -226 | 0,01 |
-| 1 | EMA 9/21 | tendance | 34 | 4,2 | 38 % | -0,067 | -0,163 | -0,8 | -5,6 | -10,5 | -278 | 0,00 |
-| 3 | MACD 12-26-9 | tendance | 53 | 6,6 | 42 % | -0,078 | -0,166 | -1,0 | -8,8 | -15,8 | -439 | 0,00 |
-| 23 | Williams %R 14 | retour | 124 | 15,5 | 50 % | -0,092 | -0,186 | -2,4 | -23,1 | -40,7 | -1154 | 0,00 |
-| 26 | MFI 14 | retour | 22 | 2,8 | 45 % | -0,139 | -0,220 | -1,2 | -4,8 | -7,5 | -242 | — |
-| 27 | Avalement | retour | 17 | 2,1 | 47 % | -0,132 | -0,236 | -1,1 | -4,0 | -6,6 | -200 | — |
-| 8 | Parabolic SAR | tendance | 54 | 6,8 | 33 % | -0,220 | -0,310 | -2,1 | -16,7 | -24,0 | -836 | 0,00 |
-| 14 | Keltner 20x2 | tendance | 43 | 5,4 | 33 % | -0,249 | -0,344 | -2,0 | -14,8 | -20,9 | -739 | 0,00 |
-| 7 | ADX/DI 14 | tendance | 7 | 0,9 | 43 % | -0,243 | -0,351 | -0,9 | -2,5 | -3,6 | -123 | — |
-| 0 | Témoin hasard | tendance | 16 | 2,0 | 31 % | -0,266 | -0,370 | -1,2 | -5,9 | -8,4 | -296 | — |
-| 28 | Pivots de la veille | retour | 5 | 0,6 | 20 % | -0,650 | -0,721 | -2,1 | -3,6 | -4,1 | -180 | — |
+| 17 | Cassure avec volume | tendance | 17 | 1,9 | 53 % | 0,523 | 0,436 | 1,2 | 7,4 | 5,2 | 370 | — |
+| 11 | Cassure ouverture Londres | tendance | 16 | 1,8 | 50 % | 0,382 | 0,291 | 0,8 | 4,7 | 2,5 | 233 | — |
+| 6 | Ichimoku nuage | tendance | 35 | 3,9 | 51 % | 0,342 | 0,254 | 1,1 | 8,9 | 4,3 | 444 | 0,17 |
+| 13 | Cassure de la veille | tendance | 13 | 1,4 | 46 % | 0,304 | 0,237 | 0,6 | 3,1 | 1,8 | 154 | — |
+| 12 | Cassure ouverture New York | tendance | 17 | 1,9 | 53 % | 0,280 | 0,216 | 0,7 | 3,7 | 2,1 | 184 | — |
+| 2 | Repli sur EMA 50 | tendance | 32 | 3,6 | 47 % | 0,228 | 0,134 | 0,5 | 4,3 | -0,2 | 214 | 0,06 |
+| 15 | Compression Bollinger | tendance | 21 | 2,3 | 48 % | 0,208 | 0,103 | 0,3 | 2,2 | -1,2 | 108 | — |
+| 9 | Heikin-Ashi | tendance | 82 | 9,1 | 45 % | 0,153 | 0,067 | 0,5 | 5,5 | -5,1 | 276 | 0,06 |
+| 19 | RSI 2 Connors | retour | 51 | 5,7 | 65 % | 0,147 | 0,063 | 0,5 | 3,2 | -3,2 | 160 | 0,07 |
+| 10 | Aroon 25 | tendance | 35 | 3,9 | 40 % | 0,111 | 0,019 | 0,1 | 0,7 | -4,2 | 33 | 0,02 |
+| 16 | Momentum ROC 12 | tendance | 69 | 7,7 | 39 % | 0,034 | -0,053 | -0,4 | -3,7 | -12,7 | -184 | 0,01 |
+| 18 | RSI 14 | retour | 37 | 4,1 | 57 % | 0,022 | -0,062 | -0,4 | -2,3 | -6,9 | -115 | 0,01 |
+| 5 | Donchian 48 | tendance | 41 | 4,6 | 39 % | 0,021 | -0,065 | -0,3 | -2,7 | -8,0 | -134 | 0,01 |
+| 22 | CCI 20 | retour | 110 | 12,2 | 55 % | 0,004 | -0,083 | -1,0 | -9,2 | -23,6 | -458 | 0,00 |
+| 20 | Retour Bollinger | retour | 72 | 8,0 | 57 % | 0,001 | -0,084 | -0,8 | -6,0 | -15,2 | -302 | 0,00 |
+| 25 | Z-score 50 | retour | 50 | 5,6 | 54 % | -0,004 | -0,089 | -0,8 | -4,5 | -10,9 | -224 | 0,00 |
+| 27 | Avalement | retour | 20 | 2,2 | 55 % | 0,000 | -0,096 | -0,5 | -1,9 | -4,8 | -96 | — |
+| 1 | EMA 9/21 | tendance | 38 | 4,2 | 39 % | -0,012 | -0,104 | -0,5 | -4,0 | -9,2 | -198 | 0,01 |
+| 24 | VWAP 2 écarts-types | retour | 41 | 4,6 | 56 % | -0,018 | -0,109 | -0,8 | -4,5 | -10,0 | -223 | 0,00 |
+| 21 | Stochastique 14-3-3 | retour | 80 | 8,9 | 55 % | -0,019 | -0,109 | -1,1 | -8,8 | -19,7 | -438 | 0,00 |
+| 4 | Supertrend 10x3 | tendance | 34 | 3,8 | 35 % | -0,022 | -0,114 | -0,5 | -3,9 | -8,6 | -193 | 0,01 |
+| 23 | Williams %R 14 | retour | 137 | 15,2 | 52 % | -0,063 | -0,153 | -2,1 | -21,0 | -39,5 | -1048 | 0,00 |
+| 3 | MACD 12-26-9 | tendance | 61 | 6,8 | 39 % | -0,120 | -0,202 | -1,4 | -12,3 | -19,9 | -616 | 0,00 |
+| 26 | MFI 14 | retour | 22 | 2,4 | 45 % | -0,139 | -0,220 | -1,2 | -4,8 | -7,5 | -242 | — |
+| 0 | Témoin hasard | tendance | 17 | 1,9 | 35 % | -0,132 | -0,233 | -0,7 | -4,0 | -6,5 | -198 | — |
+| 8 | Parabolic SAR | tendance | 61 | 6,8 | 34 % | -0,183 | -0,269 | -1,9 | -16,4 | -24,2 | -820 | 0,00 |
+| 14 | Keltner 20x2 | tendance | 48 | 5,3 | 33 % | -0,251 | -0,341 | -2,1 | -16,4 | -22,9 | -819 | 0,00 |
+| 7 | ADX/DI 14 | tendance | 8 | 0,9 | 38 % | -0,338 | -0,437 | -1,2 | -3,5 | -4,7 | -175 | — |
+| 28 | Pivots de la veille | retour | 7 | 0,8 | 29 % | -0,500 | -0,562 | -1,8 | -3,9 | -4,6 | -197 | — |
 
 Un bon backtest ne prouve rien sur l'avenir ; un mauvais est une information utile.
