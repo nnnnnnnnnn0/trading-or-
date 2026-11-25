@@ -1,3 +1,4 @@
-jours à télécharger : 1 (20 min max par exécution)
-erreur 2026-11-23 : HTTP 503
-jours ajoutés : 0 ; jours sans données : 0 ; erreurs : 1 ; reste à télécharger : 1
+jours à télécharger : 2 (20 min max par exécution)
+erreur 2026-11-23 : TimeoutError
+erreur 2026-11-24 : TimeoutError
+jours ajoutés : 0 ; jours sans données : 0 ; erreurs : 2 ; reste à télécharger : 2
