@@ -1,4 +1,4 @@
-jours à télécharger : 2 (20 min max par exécution)
-échelle des prix : 1000 (premier jour 2026-11-24, premier prix 3631.585)
-premier fichier : 2026-11-24 de 2026-11-24 00:00:00+00:00 à 2026-11-24 23:59:00+00:00 UTC, 1440 minutes
-jours ajoutés : 2 ; jours sans données : 0 ; erreurs : 0 ; reste à télécharger : 0
+jours à télécharger : 1 (20 min max par exécution)
+échelle des prix : 1000 (premier jour 2026-11-26, premier prix 3576.035)
+premier fichier : 2026-11-26 de 2026-11-26 00:00:00+00:00 à 2026-11-26 23:59:00+00:00 UTC, 1440 minutes
+jours ajoutés : 1 ; jours sans données : 0 ; erreurs : 0 ; reste à télécharger : 0
